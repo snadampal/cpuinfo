@@ -1239,6 +1239,8 @@ void cpuinfo_arm_decode_cache(
 			break;
 		}
 		case cpuinfo_uarch_neoverse_n1:
+		case cpuinfo_uarch_neoverse_v1:
+		case cpuinfo_uarch_neoverse_n2:
                 {
                         /*
                          * ARM Neoverse-n1 Core Technical Reference Manual
@@ -1708,6 +1710,8 @@ uint32_t cpuinfo_arm_compute_max_cache_size(const struct cpuinfo_processor* proc
 			 */
 			return 8 * 1024 * 1024;
 		case cpuinfo_uarch_neoverse_n1:
+		case cpuinfo_uarch_neoverse_v1:
+		case cpuinfo_uarch_neoverse_n2:
 			return 32 * 1024 * 1024;
 		case cpuinfo_uarch_cortex_a55:
 		case cpuinfo_uarch_cortex_a75:
