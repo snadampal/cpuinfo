@@ -30,6 +30,9 @@
 #define CORE_ID_FILENAME_SIZE (sizeof("/sys/devices/system/cpu/cpu" STRINGIFY(UINT32_MAX) "/topology/core_id"))
 #define CORE_ID_FILENAME_FORMAT "/sys/devices/system/cpu/cpu%" PRIu32 "/topology/core_id"
 #define CORE_ID_FILESIZE 32
+#define CACHE_FILENAME_SIZE (sizeof("/sys/devices/system/cpu/cpu" STRINGIFY(UINT32_MAX) "/cache/index%" STRINGIFY(UINT32_MAX) "/size"))
+#define CACHE_FILENAME_FORMAT "/sys/devices/system/cpu/cpu%" PRIu32 "/cache/index%" PRIu32 "/size"
+#define CACHE_FILESIZE 32
 
 #define CORE_SIBLINGS_FILENAME_SIZE (sizeof("/sys/devices/system/cpu/cpu" STRINGIFY(UINT32_MAX) "/topology/core_siblings_list"))
 #define CORE_SIBLINGS_FILENAME_FORMAT "/sys/devices/system/cpu/cpu%" PRIu32 "/topology/core_siblings_list"
@@ -212,6 +215,26 @@ bool cpuinfo_linux_get_processor_package_id(uint32_t processor, uint32_t package
 		cpuinfo_log_info("failed to parse package id for processor %"PRIu32" from %s",
 			processor, package_id_filename);
 		return false;
+	}
+}
+
+uint32_t cpuinfo_linux_get_processor_cache_size(uint32_t processor, uint32_t cache_level) {
+	char cache_size_filename[CACHE_FILENAME_SIZE];
+	const int chars_formatted = snprintf(
+		cache_size_filename, CACHE_FILENAME_SIZE, CACHE_FILENAME_FORMAT, processor, cache_level);
+	if ((unsigned int) chars_formatted >= CACHE_FILENAME_SIZE) {
+		cpuinfo_log_warning("failed to format filename for cache size of processor %"PRIu32, processor);
+		return 0;
+	}
+
+	uint32_t cache_size;
+	if (cpuinfo_linux_parse_small_file(cache_size_filename, CACHE_FILESIZE, uint32_parser, &cache_size)) {
+		cpuinfo_log_debug("parsed cache size value of %"PRIu32" KB for level %"PRIu32" for logical processor %"PRIu32" from %s",cache_size, cache_level, processor, cache_size_filename);
+		return cache_size;
+	} else {
+		cpuinfo_log_info("failed to parse cache size for level %"PRIu32"  for processor %"PRIu32" from %s",
+				cache_level, processor, cache_size_filename);
+		return 0;
 	}
 }
 

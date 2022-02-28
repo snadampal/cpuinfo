@@ -37,6 +37,7 @@ CPUINFO_INTERNAL uint32_t cpuinfo_linux_get_processor_min_frequency(uint32_t pro
 CPUINFO_INTERNAL uint32_t cpuinfo_linux_get_processor_max_frequency(uint32_t processor);
 CPUINFO_INTERNAL bool cpuinfo_linux_get_processor_package_id(uint32_t processor, uint32_t package_id[restrict static 1]);
 CPUINFO_INTERNAL bool cpuinfo_linux_get_processor_core_id(uint32_t processor, uint32_t core_id[restrict static 1]);
+CPUINFO_INTERNAL uint32_t cpuinfo_linux_get_processor_cache_size(uint32_t processor, uint32_t cache_level);
 
 CPUINFO_INTERNAL bool cpuinfo_linux_detect_possible_processors(uint32_t max_processors_count,
 	uint32_t* processor0_flags, uint32_t processor_struct_size, uint32_t possible_flag);

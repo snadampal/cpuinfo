@@ -103,7 +103,8 @@ struct cpuinfo_arm_chipset {
 		struct cpuinfo_cache l1i[restrict static 1],
 		struct cpuinfo_cache l1d[restrict static 1],
 		struct cpuinfo_cache l2[restrict static 1],
-		struct cpuinfo_cache l3[restrict static 1]);
+		struct cpuinfo_cache l3[restrict static 1],
+		uint32_t system_processor_id);
 
 	CPUINFO_INTERNAL uint32_t cpuinfo_arm_compute_max_cache_size(
 		const struct cpuinfo_processor processor[restrict static 1]);
@@ -118,5 +119,6 @@ struct cpuinfo_arm_chipset {
 		struct cpuinfo_cache l1i[1],
 		struct cpuinfo_cache l1d[1],
 		struct cpuinfo_cache l2[1],
-		struct cpuinfo_cache l3[1]);
+		struct cpuinfo_cache l3[1],
+		uint32_t system_processor_id);
 #endif

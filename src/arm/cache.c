@@ -6,6 +6,9 @@
 #include <arm/api.h>
 #include <arm/midr.h>
 
+#ifdef __linux__
+#include <arm/linux/api.h>
+#endif
 
 void cpuinfo_arm_decode_cache(
 	enum cpuinfo_uarch uarch,
@@ -17,7 +20,8 @@ void cpuinfo_arm_decode_cache(
 	struct cpuinfo_cache l1i[restrict static 1],
 	struct cpuinfo_cache l1d[restrict static 1],
 	struct cpuinfo_cache l2[restrict static 1],
-	struct cpuinfo_cache l3[restrict static 1])
+	struct cpuinfo_cache l3[restrict static 1],
+	uint32_t system_processor_id)
 {
 	switch (uarch) {
 #if CPUINFO_ARCH_ARM && !defined(__ARM_ARCH_7A__) && !defined(__ARM_ARCH_8A__)
@@ -1273,6 +1277,14 @@ void cpuinfo_arm_decode_cache(
 			const uint32_t min_l2_size_KB= 256;
 			const uint32_t min_l3_size_KB = 0;
 
+			uint32_t proc_l2_size_KB = min_l2_size_KB;
+			uint32_t proc_l3_size_KB = min_l3_size_KB;
+#ifdef __linux__
+			uint32_t l2_size_KB = cpuinfo_linux_get_processor_cache_size(system_processor_id, 2);
+			uint32_t l3_size_KB = cpuinfo_linux_get_processor_cache_size(system_processor_id, 3);
+			proc_l2_size_KB = (l2_size_KB > min_l2_size_KB) ? l2_size_KB : min_l2_size_KB;
+			proc_l3_size_KB = (l3_size_KB > min_l3_size_KB) ? l3_size_KB : min_l3_size_KB;
+#endif
 			*l1i = (struct cpuinfo_cache) {
 				.size = 64 * 1024,
 				.associativity = 4,
@@ -1284,13 +1296,13 @@ void cpuinfo_arm_decode_cache(
 				.line_size = 64,
 			};
 			*l2 = (struct cpuinfo_cache) {
-				.size = min_l2_size_KB * 1024,
+				.size = proc_l2_size_KB * 1024,
 				.associativity = 8,
 				.line_size = 64,
 				.flags = CPUINFO_CACHE_INCLUSIVE,
 			};
 			*l3 = (struct cpuinfo_cache) {
-				.size = min_l3_size_KB * 1024,
+				.size = proc_l3_size_KB * 1024,
 				.associativity = 16,
 				.line_size = 64,
 			};
@@ -1712,10 +1724,21 @@ uint32_t cpuinfo_arm_compute_max_cache_size(const struct cpuinfo_processor* proc
 			 *       - A configurable size of 256KB, 512KB, 1MB, 2MB, 4MB, or 8MB.
 			 */
 			return 8 * 1024 * 1024;
-		case cpuinfo_uarch_cortex_a55:
+
 		case cpuinfo_uarch_neoverse_n1:
 		case cpuinfo_uarch_neoverse_v1:
 		case cpuinfo_uarch_neoverse_n2:
+		{
+			const uint32_t min_l3_size_KB = 0;
+			uint32_t proc_l3_size_KB = 0;
+#ifdef __linux__
+			uint32_t l3_size_KB = cpuinfo_linux_get_processor_cache_size(processor->linux_id, 3);
+			proc_l3_size_KB = (l3_size_KB > min_l3_size_KB) ? l3_size_KB : min_l3_size_KB;
+#endif
+			return proc_l3_size_KB * 1024;
+                }
+
+		case cpuinfo_uarch_cortex_a55:
 		case cpuinfo_uarch_cortex_a75:
 		case cpuinfo_uarch_cortex_a76:
 		case cpuinfo_uarch_exynos_m4:

@@ -559,7 +559,7 @@ void cpuinfo_arm_linux_init(void) {
 			&chipset,
 			cluster_id,
 			arm_linux_processors[i].architecture_version,
-			&l1i[i], &l1d[i], &temp_l2, &temp_l3);
+			&l1i[i], &l1d[i], &temp_l2, &temp_l3, arm_linux_processors[i].system_processor_id);
 		l1i[i].processor_start = l1d[i].processor_start = i;
 		l1i[i].processor_count = l1d[i].processor_count = 1;
 		#if CPUINFO_ARCH_ARM
@@ -648,7 +648,7 @@ void cpuinfo_arm_linux_init(void) {
 			&chipset,
 			cluster_id,
 			arm_linux_processors[i].architecture_version,
-			&dummy_l1i, &dummy_l1d, &temp_l2, &temp_l3);
+			&dummy_l1i, &dummy_l1d, &temp_l2, &temp_l3, arm_linux_processors[i].system_processor_id);
 
 		if (temp_l3.size != 0) {
 			/*
